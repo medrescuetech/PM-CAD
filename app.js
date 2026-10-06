@@ -12,6 +12,8 @@ const SQLiteStore = require('connect-sqlite3')(session);
 const confFile = path.join(__dirname, 'config', 'config.json');
 const confDefaults = require('./config/default.json');
 
+fs.mkdirSync(path.dirname(confFile), { recursive: true });
+
 if (!fs.existsSync(confFile)) {
   fs.writeFileSync(confFile, JSON.stringify(confDefaults, null, 2));
   console.log('Created config file:', confFile);
@@ -20,6 +22,30 @@ if (!fs.existsSync(confFile)) {
 const nconf = require('nconf');
 nconf.file({ file: confFile });
 nconf.load();
+
+// Environment overrides for managed Node.js hosting.
+if (process.env.PORT) {
+  const hostingPort = Number(process.env.PORT);
+  if (!Number.isInteger(hostingPort) || hostingPort < 1 || hostingPort > 65535) {
+    throw new Error('PORT must be an integer between 1 and 65535');
+  }
+  nconf.set('server:port', hostingPort);
+}
+if (process.env.SESSION_SECRET) {
+  nconf.set('sessionSecret', process.env.SESSION_SECRET);
+}
+if (process.env.INGEST_API_KEY) {
+  nconf.set('ingest:apiKey', process.env.INGEST_API_KEY);
+}
+if (process.env.CAD_MODE) {
+  if (!['standalone', 'connected'].includes(process.env.CAD_MODE)) {
+    throw new Error('CAD_MODE must be standalone or connected');
+  }
+  nconf.set('mode', process.env.CAD_MODE);
+}
+
+// The session store opens before db.init creates this directory.
+fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 
 // Initialize Express first (db.init is async, called later)
 const app = express();
