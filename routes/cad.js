@@ -7,7 +7,7 @@ const db = require('../db');
 const { ensureCanEdit, ensureAdmin } = require('../middleware/auth');
 const pdfGenerator = require('../services/pdfGenerator');
 
-// CAD Dispatch Board - Main view
+// CAD Board - Main view
 router.get('/', (req, res) => {
   const services = nconf.get('services') || {};
   const serviceFilter = req.query.service || null;
@@ -64,7 +64,7 @@ router.get('/', (req, res) => {
   }
   
   res.render('cad/index', {
-    pageTitle: 'CAD Dispatch Board',
+    pageTitle: 'CAD Board',
     services,
     casesByService,
     serviceFilter,

@@ -1,7 +1,7 @@
 {
   "name": "pagermon-cad-addon",
   "version": "1.0.0",
-  "description": "CAD Dispatch and Mapping add-on for PagerMon",
+  "description": "CAD and Mapping add-on for PagerMon",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
